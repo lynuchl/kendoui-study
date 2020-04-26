@@ -1,0 +1,561 @@
+﻿
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Stict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <title></title>
+
+    <script src="~/js/jquery.min.js"></script>
+    @*<script src="~/js/articleData.js"></script>*@
+    <script src="~/js/bootstrap.min.js"></script>
+    <script src="~/js/kendo.all.min.js"></script>
+
+    <link href="~/styles/css/style.min.css" rel="stylesheet" />
+    <link href="~/styles/kendo.common.min.css" rel="stylesheet" />
+    <link href="~/styles/kendo.default.min.css" rel="stylesheet" />
+    <link href="~/styles/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/styles/kendo.default-v2.min.css" rel="stylesheet" />
+  
+    <style type="text/css">
+        tbody > tr {
+            white-space: nowrap;
+            height: 55px;
+        }
+
+        /*tbody > td {
+                    text-align:center;
+                }*/
+
+        .articalHeader {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 45px;
+            margin-top: 0px;
+        }
+
+        /*.menuButton {
+                    margin-right: 5px;
+                }*/
+
+        .articalTitle {
+            text-align: center;
+            height: 50px;
+        }
+
+        td .k-button {
+            border: none;
+        }
+
+        .groupbtn {
+            position: absolute;
+            /*top:1px;
+                    border:none;*/
+            /*top:10px;*/
+            margin-top: -15px;
+        }
+
+        .morebtn {
+            border: none;
+            background-color: transparent;
+        }
+        /*.dropdown-menu{
+                     width:30px;
+                     height:100px;
+                 }*/
+        .moreUpdate {
+            display: block;
+            width: 55px;
+        }
+
+        .moreDelete {
+            display: block;
+            width: 55px;
+        }
+
+        .dropdownMenu {
+            width: 60px;
+            /*height:80px;*/
+            min-width: 70px;
+        }
+    </style>
+    <style>
+
+        .releaseState {
+            color: blueviolet;
+        }
+
+        .noCheckState {
+            color: red;
+        }
+
+        .CheckedState {
+            color: greenyellow;
+        }
+
+        .api-status {
+            /*text-align:center;*/
+            border: 2px solid;
+            /*font-size:12px;*/
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .addInfoForm{
+
+            margin-left:60px;
+            margin-right:60px;
+            display:flex;
+            justify-content:space-between;
+        }
+      
+      
+    </style>
+</head>
+
+<body style="margin: 1px">
+
+    <div id="example">
+
+
+        <div class="articalTitle">
+            <h1>操作员信息演示网页</h1>
+        </div>
+
+        <div class="articalHeader">
+
+
+            <button class=" k-button menuButton" style="width:60px;height:40px;background-color:aquamarine;" onclick="addInfo()">新增</button>
+
+        </div>
+        <div id="articleGrid"></div>
+        <div id="addInfo"></div>
+        <div id="updateInfo"></div>
+        <div id="deleteInfo"></div>
+      
+        <script>
+       @using Newtonsoft.Json;
+       var vData=@Html.Raw(JsonConvert.SerializeObject(ViewData["operatorData"]));
+            var wnd, addInfoTemplate,updateInfoTemplate;
+            $(document).ready(function () {
+
+
+
+
+                $("#articleGrid").kendoGrid({
+                    dataSource: {
+                        //data: articleDatas,
+                        data:vData,
+                        pageSize: 15
+                    },
+                    height: 550,
+
+                    sortable: true,
+
+
+                    pageable: {
+                        //language:
+                        input: true,
+                        info: true,
+                        numeric: false,
+
+                        messages: {
+                            display: "显示 {0}-{1} 条，共 {2} 条记录",
+                            page: "第",
+                            of: "页，共 {0}页"
+
+                        }
+                    },
+                    //editable: true,
+                    columns: [
+                        //"ProductName",
+                        { field: "id", title: "ID", width: "30px", },
+                        { field: "jobNumber", title: "工号", width: "60px", },
+                        //attributes{}
+                        { field: "name", title: "姓名", width: "70px", },
+                        { field: "sex", title: "性别", width: "60px", },
+                        {field:"State",title:"状态",width:"60px"},
+
+                        { field: "password", title: "密码", width: "60px", },
+                        { field: "idNumber", title: "身份证号", width: "80px", },
+                        { field: "phone", title: "电话", width: "60px", },
+                        { field: "address", title: "地址", width: "60px", },
+                        { field: "birthday", title: "出生日期", width: "60px", },
+
+                        {
+                            command: [
+                                {
+                                    template: kendo.template($("#moreOperates").html())
+                                }
+                            ], title: "更多操作", width: "40px",
+                        }
+
+                    ],
+
+                }).data("kendoGrid");
+
+                wnd = $("#addInfo")
+                    .kendoWindow({
+                        title: "新增信息",
+                        modal: true,
+                        visible: false,
+                        resizable: false,
+                        width: 800,
+                    }).data("kendoWindow");
+                addInfoTemplate = kendo.template($("#addTemplate").html());
+
+            });
+
+            function addInfo() {
+                //e.preventDefault();
+
+                //var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+                wnd.content(addInfoTemplate);
+                wnd.center().open();
+            }
+        </script>
+        <script type="text/x-kendo-template" id="addTemplate">
+            <div id="details-container">
+                <form action="/Operator/AddInfo" method="post">
+                    @*<label><span style="margin-right:10px">id:</span><input type="text" name="id" /></label>*@
+                    <div class="addInfoForm">
+
+                        <label><span style="margin-right:10px">工&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp号:</span> <input type="text" name="jobNumber" class="k-textbox" placeholder="工号" required style="width: 220px;" /></label>
+                        @*<label><span style="margin-right:10px">工号:</span><input type="text" name="jobNumber" required /></label>*@
+                        <label><span style="margin-right:10px">姓名:</span> <input type="text" name="name" class="k-textbox" placeholder="姓名" required style="width: 220px;" /></label>
+                    </div>
+                    <div class="addInfoForm">
+
+                        @*<label><span style="margin-right:10px">姓名:</span><input type="text" name="name" required data-required-message="请输入用户名！" pattern="^[a-zA-Z0-9]*" data-pattern-msg="请输入大小写字母、或者数字!" /></label>*@
+                        <label><span style="margin-right:10px">性&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp别:</span> <input type="text" name="sex" class="k-textbox" placeholder="性别" required style="width: 220px;" /></label>
+                        <label><span style="margin-right:10px">密码:</span> <input type="text" name="password" class="k-textbox" placeholder="密码" required style="width: 220px;" /></label>
+                    </div>
+                    <div class="addInfoForm">
+
+                        <label><span style="margin-right: 10px">身份证号:</span> <input type="text" name="idNumber" class="k-textbox" placeholder="身份证号" required style="width: 220px;" /></label>
+                        <label><span style="margin-right:10px">电话:</span> <input type="text" name="phone" class="k-textbox" placeholder="电话" required style="width: 220px;" /></label>
+                    </div>
+                    <div class="addInfoForm">
+
+                        <label><span style="margin-right:10px">地&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp址:</span> <input type="text" name="address" class="k-textbox" placeholder="地址" required style="width: 220px;" /></label>
+                        <label><span style="margin-right:10px">状态:</span> <input type="text" name="State" class="k-textbox" placeholder="状态" required style="width: 220px;" /></label>
+                    </div>
+                    <div style="margin-left:60px">
+
+                        <label><span style="margin-right:10px">出生日期:</span> <input type="text" name="birthday" class="k-textbox" placeholder="出生日期" style="width: 220px;" /></label>
+                    </div>
+                    @*<label><span style="margin-right:10px">姓名:</span> <input type="text" name="name" class="k-textbox" placeholder="姓名" required style="width: 220px;" /></label>
+                    <label><span style="margin-right:10px">姓名:</span> <input type="text" name="name" class="k-textbox" placeholder="姓名" required style="width: 220px;" /></label>*@
+
+                    @*<label><span style="margin-right:10px">性别:</span><input type="text" name="sex" /></label>
+                    <label><span style="margin-right:10px">密码:</span><input type="text" name="password" /></label>
+                    <label><span style="margin-right:10px">身份证号:</span><input type="text" name="idNumber" /></label>
+                    <label><span style="margin-right:10px">电话:</span><input type="text" name="phone" /></label>
+                    <label><span style="margin-right:10px">地址:</span><input type="text" name="address" /></label>
+                    <label><span style="margin-right:10px">状态:</span><input type="text" name="state" /></label>
+                    <label><span style="margin-right:10px">出生日期:</span><input type="text" name="birthday" /></label>*@
+                    <div style="text-align:center">
+
+                        <input class="k-button" type="submit" value="提交新增" />
+                    </div>
+                </form>
+            </div>
+        </script>
+        <script type="text/x-kendo-template" id="updateTemplate">
+            <div id="details-container">
+
+                <form action="/Operator/UpdateInfo" method="post">
+                    @*<label><span style="margin-right:10px">id:</span><input type="text" name="id" /></label>*@
+                    <div class="addInfoForm">
+
+                        <label><span style="margin-right:10px">工&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp号:</span> <input type="text" name="jobNumber" class="k-textbox" placeholder="工号" required style="width: 220px;" value="#= jobNumber #" /></label>
+                        @*<label><span style="margin-right:10px">工号:</span><input type="text" name="jobNumber" required /></label>*@
+                        @*<input type="radio" name="engine" id="engine1" class="k-radio" checked="checked">*@
+                        <label><span style="margin-right:10px">姓名:</span> <input type="text" name="name" class="k-textbox" placeholder="姓名" required style="width: 220px;" value="#= name #" /></label>
+                    </div>
+                    <div class="addInfoForm">
+                        @*<input type="text" name="sex" class="k-textbox" placeholder="性别" required style="width: 220px;" value="#= sex #" />*@
+                        @*<label><span style="margin-right:10px">姓名:</span><input type="text" name="name" required data-required-message="请输入用户名！" pattern="^[a-zA-Z0-9]*" data-pattern-msg="请输入大小写字母、或者数字!" /></label>*@
+                        <div class="classSelect">
+                            <label>
+                                <span style="margin-right:10px">性&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp别:</span>
+                                <input type="radio" name="sex" id="radioBoy" class="k-radio sexRadio" value="男" data-bind="checked: selectedSexRadio"  >
+                                <label class="k-radio-label" for="radioBoy" style="margin-right:50px" >男</label>
+
+                                <input type="radio" name="sex" id="radioGirl" class="k-radio sexRadio" value="女" style="margin-left:50px" data-bind="checked: selectedSexRadio">
+                                <label class="k-radio-label" for="radioGirl">女</label>
+                            </label>
+
+                            @*<input type="radio" name="engine" id="engine1" class="k-radio" checked="checked">
+                            <label class="k-radio-label" for="engine1">男</label>
+                            <input type="radio" name="engine1" id="engine2" class="k-radio" >
+                            <label class="k-radio-label" for="engine1">女</label>*@
+                        </div>
+                        @*<label><span style="margin-right:10px">性&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp别:</span> <input type="radio" name="boy" id="engine1" class="k-radio" checked="checked"> <input type="radio" name="girl" id="engine2" class="k-radio"></label>*@
+                        <label><span style="margin-right:10px">密码:</span> <input type="text" name="password" class="k-textbox" placeholder="密码" required style="width: 220px;" value="#= password #" /></label>
+                    </div>
+                    <div class="addInfoForm">
+
+                        <label><span style="margin-right: 10px">身份证号:</span> <input type="text" name="idNumber" class="k-textbox" placeholder="身份证号" required style="width: 220px;" value="#= idNumber #" /></label>
+                        <label><span style="margin-right:10px">电话:</span> <input type="text" name="phone" class="k-textbox" placeholder="电话" required style="width: 220px;" value="#= phone #" /></label>
+                    </div>
+                    <div class="addInfoForm">
+
+                        <label><span style="margin-right:10px">地&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp址:</span> <input type="text" name="address" class="k-textbox" placeholder="地址" required style="width: 220px;" value="#= address #" /></label>
+                        @*<label><span style="margin-right:10px">状态:</span> <input type="text" name="State" class="k-textbox" placeholder="状态" required style="width: 220px;" value="#= State #" /></label>*@
+                        @*<label for="stateDropDown">状态</label>*@
+                        @*<label><span style="margin-right:10px">状态:</span> <input id="stateDropDown" value="1" style="width: 150px;" /></label>*@
+                        @*<h4><label for="c1olor">Cap Color</label></h4>
+                        <input id="c1olor" value="1" style="width: 200px;" />*@
+                    <label>状&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp态:<input class="stateDropDown" name="State" style="width:220px" /></label>
+
+
+                    </div>
+                    <div class="addInfoForm">
+                        <label><span style="margin-right:10px">出生日期:</span> <input type="text" name="birthday" class="k-textbox" placeholder="出生日期" style="width: 220px;" value="#= birthday #" /></label>
+                        <label style="visibility:hidden"><span style="margin-right:10px">id:</span><input contenteditable="false" class="k-textbox" name="id" style="width: 220px;" value="#= id #" /></label>
+                    </div>
+
+                    <div style="text-align:center">
+
+                        <input class="k-button" type="submit" value="提交修改" />
+                    </div>
+                </form>
+
+            </div>
+        </script>
+        <script type="text/x-kendo-template" id="moreOperates">
+
+            <div class="btn-group groupbtn">
+
+                <button class="btn k-button dropdown-toggle morebtn " data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+                    <i class="k-icon k-i-more-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdownMenu">
+                    <li class="moreUpdate k-button" onclick="updateInfo()">修改</li>
+                    <li class="moreDelete k-button" onclick="deleteInfo()">删除</li>
+                </ul>
+            </div>
+
+        </script>
+
+
+        @*<script type="text/x-kendo-template" id="stateColor">
+
+            <span class="api-status" id="status">
+                #if (ArticalState == 1) {# 已发布 #}else if(ArticalState==2){# 未审核 #}
+                else if(ArticalState==3){# 已审核 #}else{# 未知 #} #
+            </span>
+
+        </script>*@
+
+        <script>
+            //$(".morePreview")
+
+
+            updatewnd = $("#updateInfo")
+                .kendoWindow({
+                    title: "修改信息",
+                    modal: true,
+                    visible: false,
+                    resizable: false,
+                    width: 800
+                }).data("kendoWindow");
+            updateInfoTemplate = kendo.template($("#updateTemplate").html());
+
+
+            var updateData;
+
+
+            $(function () {
+
+
+
+                $(".morebtn").click(function () {
+
+                    var tr = $(this).closest("tr");
+                    var grid = $("#articleGrid").data("kendoGrid");
+                    updateData = grid.dataItem(tr);
+
+                });
+
+            })
+            $(document).ready(function () {
+
+                //var validatable = $(".form-validation").kendoValidator().data("kendoValidator");
+            });
+
+            function updateInfo() {
+
+
+                updatewnd.content(updateInfoTemplate(updateData));
+
+
+               
+
+              
+                var sexData = updateData["sex"];
+                var sexResult = kendo.observable({
+                   
+                    selectedSexRadio: sexData
+                });
+                    kendo.bind($(".sexRadio"), sexResult);
+
+                //if (sexData=="男") {
+                //    //$("#radioBoy").attr["checked"].nodeValue = true;
+                //    //$("#radioGirl").attr["checked"] = false;
+
+                //    kendo.bind($(".sexRadio"), sexResult);
+                //} else {
+                //    //$("#radioBoy").attr["checked"] = checked;
+                //    kendo.bind($(".sexRadio"), sexResult);
+                //    //$("#radioGirl")["checked"]=true;
+                //    //$("#radioGirl").prop("checked")=checked;
+
+                //    //int a = 4;
+                   
+                //    }
+
+                    var data = [
+                        { text: "状态1", value: "状态1" },
+                        { text: "状态2", value: "状态2" },
+                        { text: "状态3", value: "状态3" }
+                    ];
+
+                    // create DropDownList from input HTML element
+                    $(".stateDropDown").kendoDropDownList({
+                        dataTextField: "text",
+                        dataValueField: "value",
+                        dataSource: data,
+                        index: 0,
+                       
+                    });
+                //var stateSelected = $(".stateDropDown").data("kendoDropDownList");
+                //stateSelected.select(2);
+                updatewnd.center().open();
+              
+            }
+
+            function deleteInfo() {
+                var r = confirm("您确定要删除?")
+                if (r == true) {
+
+                    $.ajax({
+                        'type': 'post', 'url': '/Operator/Delete',
+                        //传递的数据也可以是序列化之后的json格式数据
+                        //如，上面使用form表单提交数据就可以使用jquery中的serialize()方法将表单进行序列化之后在提交
+                        //data:$('#form').serialize()
+                        //'data': { username: '雪飞鸿', age: '24' },
+                        'data': { deleteDataID: JSON.stringify(updateData["id"]) },
+                        success: function () {
+                            location.href = "/Operator";
+                        }
+                        //error: function (message) {
+                        //    alert('error!');
+                        //}
+                    });
+                    //$.ajax({
+                    //    'type': 'post',
+                    //    'url':'/Operator'
+                    //})
+                    //location.href ="/Operator/Delete?deleteData=updateData"
+
+                    //$.post("/alcf/del", { id: id }, function (result) {
+                    //    window.location.reload();
+                    //})
+
+
+                    //$.post("/Operator/Delete", { data: updateData }, function () {
+
+                    //    alert("submit data is OK!");
+
+                    //});
+
+                    //$.cookie('key', 'jscookie');
+
+                    //location.href = "/Operator/Delete";
+
+                    //$.ajax({
+
+                    //    url: '/Operator/Delete',
+
+                    //    //data: JSON.stringify(updateData),
+                    //    data:{ username: '雪飞鸿', age: '24' },
+                    //    //data: updateData,
+
+                    //    type: 'POST',
+
+                    //    contentType: 'application/json;charset=utf-8',
+
+                    //    async: false,
+
+                    //    success: function (data) {
+
+                    //        //window.location.href = "/RequestStatus/RequestDetail?requestID=" + data.RequestID;
+
+                    //        alert("Postting data is over!");
+
+                    //    }
+
+                    //});
+
+
+                } else { return; }
+
+            }
+            //$(".moreUpdate").click(updateInfo());
+        </script>
+        <script>
+            $(document).ready(function () {
+               
+
+                // create DropDownList from select HTML element
+
+
+
+
+
+            });
+        </script>
+        <script>
+
+            //function createDialog(src, width, height) {
+            //    var _doc_width = $(document).width();
+            //    var _doc_height = $(document).height();
+            //    var _html = "<div id='bg' style='position: absolute; z-index: 10000; display: block; left: 0px; top: 0px; opacity: 0.5; height: " + _doc_width + "px; width: " + _doc_width + "px; background-color:#CCC;'></div>";
+            //    _html += "<div id='ifdiv'style='z-index:10001;background-color:#FFF;border:solid 10px #cef;position: fixed; left:128px; top:32px;'>";
+            //    _html += "<iframe src='" + src + "' frameborder='0' style='width:" + width + "px;height:" + height + "px;overflow:visible;'></iframe></div>";
+            //    $('body').append(_html);
+            //}
+
+
+            function addOperatorInfo(e) {
+                //alert("hello");
+
+
+
+
+                //    e.preventDefault();
+
+                //    //var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+                //    //wnd.content(detailsTemplate(dataItem));
+                //wnd.content("hellow");
+                //    wnd.center().open();
+                //window.location = "http://www.baidu.com";
+                //$('body').append(test1.html);
+                //layer.open({
+                //    title: "hellow rold",
+                //}
+
+
+
+            }
+        </script>
+
+    </div>
+
+
+</body>
+</html>

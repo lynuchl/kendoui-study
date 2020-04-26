@@ -1,0 +1,58 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/jquery-validation/dist/"></script>
+
+  
+</head>
+<body>
+
+
+
+    <div class="jumbotron">
+        <h1>@ViewBag.Title</h1>
+        <p class="lead">Form binding to bootstrap modal with the Ajax Helpers<p>
+    </div>
+
+    @*<%=Ajax.ActionLink()%>*@
+
+    @*@Ajax.ActionLink("Add Person", "Person", null,
+    new AjaxOptions() { HttpMethod = "Get", UpdateTargetId = "modalContent", InsertionMode = InsertionMode.Replace, OnBegin = "onBegin", OnSuccess = "onSuccess", OnFailure = "onFailure", OnComplete = "onComplete" },
+    new { id = "btnPerson", @class = "btn btn-lg btn-info" })*@
+
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" id="modalContent">
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        @*@Scripts.Render("~/bundles/jquery")*@
+
+        <script type="text/javascript">
+            function onBegin() {
+                //alert('begin');
+            }
+
+            function onSuccess() {
+                //alert('success');
+            }
+
+            function onComplete() {
+                //alert('complete');
+                $('#myModal').modal('show');
+            }
+
+            function onFailure() {
+                alert('fail');
+            }
+        </script>
+    }
+
+</body>
+</html>
